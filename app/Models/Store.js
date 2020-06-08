@@ -7,7 +7,7 @@ class Store extends Model {
   user() {
     return this.belongsTo("App/Models/User");
   }
-  tokens() {
+  products() {
     return this.hasMany("App/Models/Product");
   }
 }
