@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +14,17 @@
 */
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
-const Route = use('Route')
+const Route = use("Route");
 
-Route.on('/').render('welcome')
+// --------------------->> Public routes <<----------------------- //
+
+Route.post("/authenticate", "UserController.login");
+Route.post("/register", "UserController.createCustomer");
+
+// --------------------->> Admin routes <<------------------------ //
+Route.group(() => {
+  Route.get("/users", "UserController.index");
+  Route.post("/register-seller", "UserController.createSeller");
+})
+  .prefix("admin")
+  .middleware(["auth"]);
