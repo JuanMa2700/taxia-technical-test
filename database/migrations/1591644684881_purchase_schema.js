@@ -8,14 +8,19 @@ class PurchaseSchema extends Schema {
     this.create("purchases", (table) => {
       table.increments();
       table.timestamps();
-      table.integer("user_id").unsigned().references("id").inTable("users");
+      table
+        .integer("user_id")
+        .unsigned()
+        .references("id")
+        .inTable("users")
+        .notNullable();
       table
         .integer("product_id")
         .unsigned()
         .references("id")
-        .inTable("products");
-      table.integer("value").notNullable();
-      table.date("transaction_date");
+        .inTable("products")
+        .notNullable();
+      table.dateTime("transaction_date").notNullable();
     });
   }
 

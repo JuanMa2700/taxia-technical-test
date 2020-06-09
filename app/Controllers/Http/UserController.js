@@ -14,17 +14,17 @@ class UserController {
   }
 
   async createCustomer({ request, response }) {
-    const userData = request.only(["username", "email", "password"]);
-    userData.roles = "customer";
-    const user = await User.create(userData);
-    return response.created(user.toJSON());
+    const user = request.only(["username", "email", "password"]);
+    user.roles = "customer";
+    const created = await User.create(user);
+    return response.created(created.toJSON());
   }
 
   async createSeller({ request, response }) {
-    const userData = request.only(["username", "email", "password"]);
-    userData.roles = "seller";
-    const user = await User.create(userData);
-    return response.created(user.toJSON());
+    const user = request.only(["username", "email", "password"]);
+    user.roles = "seller";
+    const created = await User.create(user);
+    return response.created(created.toJSON());
   }
 }
 

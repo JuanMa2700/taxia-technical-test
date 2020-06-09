@@ -4,6 +4,9 @@
 const Model = use("Model");
 
 class Product extends Model {
+  static get hidden() {
+    return ["created_at", "updated_at"];
+  }
   store() {
     return this.belongsTo("App/Models/Store");
   }

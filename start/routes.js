@@ -28,3 +28,27 @@ Route.group(() => {
 })
   .prefix("admin")
   .middleware(["auth", "authorized:admin"]);
+
+// -------------------->> Customer routes <<---------------------- //
+
+Route.group(() => {
+  Route.get("/products", "ProductController.aviableProducts");
+  Route.get("/purchases", "PurchaseController.customerPurchases");
+  Route.post("/make-purchase", "PurchaseController.makePurchase");
+}).middleware(["auth", "authorized:customer"]);
+
+// -------------------->> Seller routes <<------------------------ //
+
+Route.group(() => {
+  Route.get("/products", "ProductController.sellerProducts");
+  Route.post("/register-product", "ProductController.registerProduct");
+})
+  .prefix("seller")
+  .middleware(["auth", "authorized:seller"]);
+
+// ------------------->> Shared routes <<------------------------- //
+
+Route.get("/purchase", "PurchaseController.purchaseDetails").middleware([
+  "auth",
+  "authorized:seller,customer",
+]);

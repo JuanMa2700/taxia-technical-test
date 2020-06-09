@@ -8,10 +8,11 @@ class ProductSchema extends Schema {
     this.create("products", (table) => {
       table.increments();
       table.timestamps();
-      table.string("name", 50).notNullable().unique();
+      table.string("name", 50).notNullable();
       table.integer("price").notNullable();
       table.integer("stock").notNullable();
       table.integer("store_id").unsigned().references("id").inTable("stores");
+      table.unique(["name", "store_id"]);
     });
   }
 

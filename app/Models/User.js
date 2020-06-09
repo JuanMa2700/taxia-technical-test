@@ -12,6 +12,9 @@ class User extends Model {
       }
     });
   }
+  static get hidden() {
+    return ["password", "created_at", "updated_at"];
+  }
   tokens() {
     return this.hasMany("App/Models/Token");
   }

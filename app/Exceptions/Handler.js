@@ -21,6 +21,8 @@ class ExceptionHandler extends BaseExceptionHandler {
    * @return {void}
    */
   async handle(error, { request, response }) {
+    console.log(error);
+    console.log(error.code);
     switch (error.code) {
       case "ER_NO_DEFAULT_FOR_FIELD":
         return response.internalServerError({ message: error.sqlMessage });
@@ -36,6 +38,12 @@ class ExceptionHandler extends BaseExceptionHandler {
         return response.internalServerError({ message: error.sqlMessage });
       case "UNAUTHORIZED":
         return response.internalServerError({ message: "Unauthorized" });
+      case "E_INVALID_JWT_TOKEN":
+        return response.internalServerError({ message: error.message });
+      case "ER_NO_REFERENCED_ROW_2":
+        return response.internalServerError({ message: error.sqlMessage });
+      case "NO_PRODUCT":
+        return response.internalServerError({ message: "Depleted stock" });
       default:
         break;
     }
