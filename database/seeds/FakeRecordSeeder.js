@@ -12,7 +12,6 @@
 
 /** @type {import('@adonisjs/lucid/src/Factory')} */
 const Factory = use("Factory");
-const db = use("Database");
 const Purchase = use("App/Models/Purchase");
 const Product = use("App/Models/Product");
 const User = use("App/Models/User");

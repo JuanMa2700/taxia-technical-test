@@ -1,6 +1,8 @@
 "use strict";
 
 const User = use("App/Models/User");
+const Purchase = use("App/Models/Purchase");
+const Store = use("App/Models/Store");
 
 class UserController {
   async login({ auth, request, response }) {
@@ -25,6 +27,17 @@ class UserController {
     user.roles = "seller";
     const created = await User.create(user);
     return response.created(created.toJSON());
+  }
+  async potentialCustomers({ auth, request, response }) {
+    const page = request.get().page || 1;
+    const { initialDate, finalDate } = request.all();
+    const store = await Store.findBy("user_id", auth.user.id);
+    return response.ok(
+      await store
+        .purchases()
+        .whereBetween("transaction_date", [initialDate, finalDate])
+        .paginate(page, 10)
+    );
   }
 }
 

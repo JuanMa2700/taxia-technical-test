@@ -41,7 +41,10 @@ Route.group(() => {
 
 Route.group(() => {
   Route.get("/products", "ProductController.sellerProducts");
+  Route.get("/sales", "PurchaseController.sellerSales");
+  Route.get("/sales-count", "ProductController.salesCount");
   Route.post("/register-product", "ProductController.registerProduct");
+  Route.post("/potential-customers", "UserController.potentialCustomers");
 })
   .prefix("seller")
   .middleware(["auth", "authorized:seller"]);

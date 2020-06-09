@@ -13,6 +13,9 @@ class Store extends Model {
   products() {
     return this.hasMany("App/Models/Product");
   }
+  purchases() {
+    return this.manyThrough("App/Models/Product", "purchases");
+  }
 }
 
 module.exports = Store;

@@ -24,6 +24,9 @@ class User extends Model {
   purchases() {
     return this.hasMany("App/Models/Purchase");
   }
+  products() {
+    return this.manyThrough("App/Models/Store", "products");
+  }
 }
 
 module.exports = User;

@@ -44,6 +44,8 @@ class ExceptionHandler extends BaseExceptionHandler {
         return response.internalServerError({ message: error.sqlMessage });
       case "NO_PRODUCT":
         return response.internalServerError({ message: "Depleted stock" });
+      case "E_ROUTE_NOT_FOUND":
+        return response.internalServerError({ message: "Route not found" });
       default:
         break;
     }
