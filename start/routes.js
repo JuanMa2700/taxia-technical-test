@@ -27,4 +27,4 @@ Route.group(() => {
   Route.post("/register-seller", "UserController.createSeller");
 })
   .prefix("admin")
-  .middleware(["auth"]);
+  .middleware(["auth", "authorized:admin"]);
