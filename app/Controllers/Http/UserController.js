@@ -1,8 +1,8 @@
 "use strict";
 
 const User = use("App/Models/User");
-const Purchase = use("App/Models/Purchase");
 const Store = use("App/Models/Store");
+const dayjs = use("dayjs");
 
 class UserController {
   async login({ auth, request, response }) {
@@ -30,11 +30,20 @@ class UserController {
   }
   async potentialCustomers({ auth, request, response }) {
     const page = request.get().page || 1;
-    const { initialDate, finalDate } = request.all();
+    let { initialDate, finalDate } = request.all();
     const store = await Store.findBy("user_id", auth.user.id);
+    if (!initialDate || !finalDate)
+      return response.ok(
+        await store.purchases().with("user").paginate(page, 10)
+      );
+    if (!dayjs(initialDate).isValid() || !dayjs(initialDate).isValid())
+      throw { code: "INVALID_DATE" };
+    initialDate = dayjs(initialDate).format("YYYY-MM-DD");
+    finalDate = dayjs(finalDate).format("YYYY-MM-DD");
     return response.ok(
       await store
         .purchases()
+        .with("user")
         .whereBetween("transaction_date", [initialDate, finalDate])
         .paginate(page, 10)
     );

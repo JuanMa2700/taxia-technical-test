@@ -20,32 +20,32 @@ class ExceptionHandler extends BaseExceptionHandler {
    *
    * @return {void}
    */
-  async handle(error, { request, response }) {
-    console.log(error);
-    console.log(error.code);
+  async handle(error, { response }) {
     switch (error.code) {
       case "ER_NO_DEFAULT_FOR_FIELD":
         return response.internalServerError({ message: error.sqlMessage });
       case "ER_DUP_ENTRY":
         return response.internalServerError({ message: error.sqlMessage });
       case "E_JWT_TOKEN_EXPIRED":
-        return response.internalServerError({ message: "JWT Token Expired" });
+        return response.unauthorized({ message: "JWT Token Expired" });
       case "E_USER_NOT_FOUND":
-        return response.internalServerError({ message: "Invalid Email" });
+        return response.unauthorized({ message: "Invalid Email" });
       case "E_PASSWORD_MISMATCH":
-        return response.internalServerError({ message: "Invalid Password" });
+        return response.unauthorized({ message: "Invalid Password" });
       case "ER_DATA_TOO_LONG":
         return response.internalServerError({ message: error.sqlMessage });
       case "UNAUTHORIZED":
-        return response.internalServerError({ message: "Unauthorized" });
+        return response.unauthorized({ message: "Unauthorized" });
       case "E_INVALID_JWT_TOKEN":
-        return response.internalServerError({ message: error.message });
+        return response.unauthorized({ message: error.message });
       case "ER_NO_REFERENCED_ROW_2":
         return response.internalServerError({ message: error.sqlMessage });
       case "NO_PRODUCT":
         return response.internalServerError({ message: "Depleted stock" });
       case "E_ROUTE_NOT_FOUND":
         return response.internalServerError({ message: "Route not found" });
+      case "INVALID_DATE":
+        return response.internalServerError({ message: "Invalid date" });
       default:
         break;
     }
@@ -61,7 +61,7 @@ class ExceptionHandler extends BaseExceptionHandler {
    *
    * @return {void}
    */
-  async report(error, { request }) {}
+  // async report(error, { request }) {}
 }
 
 module.exports = ExceptionHandler;

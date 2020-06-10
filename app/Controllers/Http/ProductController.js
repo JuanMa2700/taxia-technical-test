@@ -6,7 +6,7 @@ const User = use("App/Models/User");
 const Store = use("App/Models/Store");
 
 class ProductController {
-  async aviableProducts({ request, response }) {
+  async availableProducts({ request, response }) {
     const page = request.get().page || 1;
     return response.ok(
       await Product.query().where("stock", ">", 0).paginate(page, 10)

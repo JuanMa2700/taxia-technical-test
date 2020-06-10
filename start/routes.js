@@ -32,7 +32,7 @@ Route.group(() => {
 // -------------------->> Customer routes <<---------------------- //
 
 Route.group(() => {
-  Route.get("/products", "ProductController.aviableProducts");
+  Route.get("/products", "ProductController.availableProducts");
   Route.get("/purchases", "PurchaseController.customerPurchases");
   Route.post("/make-purchase", "PurchaseController.makePurchase");
 }).middleware(["auth", "authorized:customer"]);

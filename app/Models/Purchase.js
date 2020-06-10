@@ -7,7 +7,8 @@ class Purchase extends Model {
   static boot() {
     super.boot();
     this.addHook("beforeSave", async (purchaseInstance) => {
-      purchaseInstance.transaction_date = new Date();
+      if (!purchaseInstance.transaction_date)
+        purchaseInstance.transaction_date = new Date();
     });
     this.addHook("afterSave", async (purchaseInstance) => {
       const product = await purchaseInstance.product().fetch();
