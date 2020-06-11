@@ -14,7 +14,7 @@ test("[Login] Wrong email", async ({ client }) => {
     })
     .end();
   // Check response status
-  response.assertStatus(401);
+  response.assertStatus(404);
 
   // check response content
   response.assertJSONSubset({ message: "Invalid Email" });

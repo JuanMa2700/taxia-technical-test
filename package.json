@@ -1,8 +1,8 @@
 {
-  "name": "adonis-fullstack-app",
+  "name": "taxia-technical-test",
   "version": "4.1.0",
   "adonis-version": "4.1.0",
-  "description": "The fullstack application boilerplate for Adonisjs",
+  "description": "Virtual Store for Taxia Technical Test",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
@@ -13,7 +13,7 @@
     "adonisjs",
     "adonis-app"
   ],
-  "author": "",
+  "author": "JuanMa2700",
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
@@ -29,7 +29,9 @@
     "@adonisjs/shield": "^1.0.8",
     "@adonisjs/vow": "^1.0.17",
     "dayjs": "^1.8.28",
-    "mysql": "^2.18.1"
+    "mongoose": "^5.9.18",
+    "mysql": "^2.18.1",
+    "unirest": "^0.6.0"
   },
   "devDependencies": {
     "eslint": "^7.2.0",

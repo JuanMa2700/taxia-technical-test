@@ -20,6 +20,7 @@ class PurchaseSchema extends Schema {
         .references("id")
         .inTable("products")
         .notNullable();
+      table.string("address", 100).notNullable();
       table.dateTime("transaction_date").notNullable();
     });
   }

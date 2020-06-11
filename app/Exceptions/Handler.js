@@ -29,7 +29,7 @@ class ExceptionHandler extends BaseExceptionHandler {
       case "E_JWT_TOKEN_EXPIRED":
         return response.unauthorized({ message: "JWT Token Expired" });
       case "E_USER_NOT_FOUND":
-        return response.unauthorized({ message: "Invalid Email" });
+        return response.notFound({ message: "Invalid Email" });
       case "E_PASSWORD_MISMATCH":
         return response.unauthorized({ message: "Invalid Password" });
       case "ER_DATA_TOO_LONG":
@@ -45,9 +45,19 @@ class ExceptionHandler extends BaseExceptionHandler {
       case "E_ROUTE_NOT_FOUND":
         return response.internalServerError({ message: "Route not found" });
       case "INVALID_DATE":
-        return response.internalServerError({ message: "Invalid date" });
+        return response.badRequest({ message: "Invalid date" });
+      case "MISSING_DATA":
+        return response.badRequest({
+          message: "Missing data for transaction",
+        });
+      case "NOT_COVERED":
+        return response.serviceUnavailable({
+          message: "Your location is not covered by this store",
+        });
       default:
-        break;
+        return response.internalServerError({
+          message: "Internal Server error",
+        });
     }
   }
 

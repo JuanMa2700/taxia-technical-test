@@ -9,9 +9,7 @@ module.exports = {
     ecmaVersion: 11,
   },
   rules: {
-    "no-mixed-spaces-and-tabs": 0,
-    "no-path-concat": 2,
-    "no-process-exit": 2,
+    allowEmptyCatch: true,
   },
   globals: {
     use: "readonly",

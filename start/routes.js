@@ -34,6 +34,7 @@ Route.group(() => {
 Route.group(() => {
   Route.get("/products", "ProductController.availableProducts");
   Route.get("/purchases", "PurchaseController.customerPurchases");
+  Route.get("/purchase", "PurchaseController.purchaseDetails");
   Route.post("/make-purchase", "PurchaseController.makePurchase");
 }).middleware(["auth", "authorized:customer"]);
 
@@ -42,16 +43,10 @@ Route.group(() => {
 Route.group(() => {
   Route.get("/products", "ProductController.sellerProducts");
   Route.get("/sales", "PurchaseController.sellerSales");
+  Route.get("/sale", "PurchaseController.purchaseDetails");
   Route.get("/sales-count", "ProductController.salesCount");
   Route.post("/register-product", "ProductController.registerProduct");
   Route.post("/potential-customers", "UserController.potentialCustomers");
 })
   .prefix("seller")
   .middleware(["auth", "authorized:seller"]);
-
-// ------------------->> Shared routes <<------------------------- //
-
-Route.get("/purchase", "PurchaseController.purchaseDetails").middleware([
-  "auth",
-  "authorized:seller,customer",
-]);

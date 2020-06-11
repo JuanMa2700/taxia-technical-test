@@ -1,46 +1,55 @@
 "use strict";
 
+const purchaseService = use("App/Services/PurchaseService");
 const Purchase = use("App/Models/Purchase");
+const Product = use("App/Models/Product");
 const Store = use("App/Models/Store");
 
 class PurchaseController {
   async makePurchase({ auth, request, response }) {
-    const purchase = request.only(["product_id"]);
-    purchase.user_id = auth.user.id;
-    return response.created(await Purchase.create(purchase));
+    return response.created(await purchaseService.makePurchase(auth, request));
   }
-  async purchaseDetails({ request, response }) {
-    const purchase = await Purchase.query()
-      .with("user")
-      .with("product")
-      .where("id", request.get().purchase_id)
-      .fetch();
-    return response.ok(purchase);
+  async purchaseDetails({ auth, request, response }) {
+    await this.purchaseAccessPermission(auth, request);
+    return response.ok(await purchaseService.purchaseDetails(request));
   }
   async customerPurchases({ auth, request, response }) {
     this.hasPermission(auth, request);
-    const page = request.get().page || 1;
-    return response.ok(
-      await Purchase.query()
-        .with("product")
-        .where("user_id", request.get().user_id)
-        .paginate(page, 10)
-    );
+    return response.ok(await purchaseService.customerPurchases(request));
   }
   async sellerSales({ auth, request, response }) {
     this.hasPermission(auth, request);
-    const page = request.get().page || 1;
-    const store = await Store.findBy("user_id", request.get().user_id);
-    return response.ok(
-      await store.purchases().with("user").with("product").paginate(page, 10)
-    );
+    return response.ok(await purchaseService.sellerSales(request));
   }
+  // Allow user to access only their own resources based on user_id param in url
+  // if role is admin, access is granted
   hasPermission(auth, request) {
     if (
       auth.user.id != request.get().user_id &&
       !auth.user.roles.split(",").some((x) => x === "admin")
     )
       throw { code: "UNAUTHORIZED" };
+  }
+  // Allow user to access only their own purchases based on purchase_id param in url
+  // if role is admin, access is granted
+  // if role is customer, access is granted for their purchases only
+  // if role is seller, access is granted for their sales only
+  async purchaseAccessPermission(auth, request) {
+    if (!auth.user.roles.includes("admin")) {
+      if (auth.user.roles.includes("customer")) {
+        const ids = await Purchase.query().where("user_id", auth.user.id).ids();
+        if (!ids.includes(parseInt(request.get().purchase_id))) {
+          throw { code: "UNAUTHORIZED" };
+        }
+      } else if (auth.user.roles.includes("seller")) {
+        const store = await Store.findBy("user_id", auth.user.id);
+        const purchases = await store.purchases().fetch();
+        const permission = purchases.rows.some(
+          (p) => p.id == parseInt(request.get().purchase_id)
+        );
+        if (!permission) throw { code: "UNAUTHORIZED" };
+      }
+    }
   }
 }
 

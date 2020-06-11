@@ -62,6 +62,36 @@ test("purchases request ok", async ({ client }) => {
   response.assertHeader("content-type", "application/json; charset=utf-8");
 });
 
+test("unauthorized purchase details", async ({ client }) => {
+  const response = await client
+    .get("/purchase")
+    .query({ purchase_id: 32 })
+    .header("authorization", "Bearer " + token)
+    .accept("json")
+    .end();
+
+  // Check response status
+  response.assertStatus(401);
+  // check response content
+  response.assertJSON({
+    message: "Unauthorized",
+  });
+});
+
+test("purchase details ok", async ({ client }) => {
+  const response = await client
+    .get("/purchase")
+    .query({ purchase_id: 30 })
+    .header("authorization", "Bearer " + token)
+    .accept("json")
+    .end();
+
+  // Check response status
+  response.assertStatus(200);
+  // Chek response content
+  response.assertHeader("content-type", "application/json; charset=utf-8");
+});
+
 test("make purchase product id missing", async ({ client }) => {
   const response = await client
     .post("/make-purchase")
@@ -70,12 +100,34 @@ test("make purchase product id missing", async ({ client }) => {
     .end();
 
   // Check response status
-  response.assertStatus(500);
+  response.assertStatus(400);
   // Chek response content
   response.assertHeader("content-type", "application/json; charset=utf-8");
   // check response content
   response.assertJSON({
-    message: "Field 'product_id' doesn't have a default value",
+    message: "Missing data for transaction",
+  });
+});
+
+test("make purchase uncovered location", async ({ client }) => {
+  const response = await client
+    .post("/make-purchase")
+    .send({
+      product_id: 5,
+      longitude: 4.801859,
+      latitude: -75.69355,
+    })
+    .header("authorization", "Bearer " + token)
+    .accept("json")
+    .end();
+
+  // Check response status
+  response.assertStatus(503);
+  // Chek response content
+  response.assertHeader("content-type", "application/json; charset=utf-8");
+  // check response content
+  response.assertJSON({
+    message: "Your location is not covered by this store",
   });
 });
 
@@ -84,6 +136,8 @@ test("make purchase ok", async ({ client }) => {
     .post("/make-purchase")
     .send({
       product_id: 5,
+      longitude: 5.058979,
+      latitude: -75.48579,
     })
     .header("authorization", "Bearer " + token)
     .accept("json")

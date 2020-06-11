@@ -35,5 +35,6 @@ Factory.blueprint("App/Models/Product", (faker) => {
     name: faker.word({ syllables: Math.random() * (5 - 1) + 1 }),
     price: faker.integer({ min: 100, max: 5000 }),
     stock: faker.integer({ min: 1, max: 10 }),
+    image_url: "https://picsum.photos/200/300",
   };
 });

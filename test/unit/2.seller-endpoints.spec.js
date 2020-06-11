@@ -100,12 +100,43 @@ test("sales count request ok", async ({ client }) => {
   response.assertHeader("content-type", "application/json; charset=utf-8");
 });
 
+test("unauthorized purchase details", async ({ client }) => {
+  const response = await client
+    .get("/seller/sale")
+    .query({ purchase_id: 32 })
+    .header("authorization", "Bearer " + token)
+    .accept("json")
+    .end();
+
+  // Check response status
+  response.assertStatus(401);
+  // check response content
+  response.assertJSON({
+    message: "Unauthorized",
+  });
+});
+
+test("purchase details ok", async ({ client }) => {
+  const response = await client
+    .get("/seller/sale")
+    .query({ purchase_id: 30 })
+    .header("authorization", "Bearer " + token)
+    .accept("json")
+    .end();
+
+  // Check response status
+  response.assertStatus(200);
+  // Chek response content
+  response.assertHeader("content-type", "application/json; charset=utf-8");
+});
+
 test("register product price missing", async ({ client }) => {
   const response = await client
     .post("/seller/register-product")
     .send({
       name: "lámpara neón",
       stock: 12,
+      image_url: "https://picsum.photos/200/300",
     })
     .header("authorization", "Bearer " + token)
     .accept("json")
@@ -128,6 +159,7 @@ test("register product ok", async ({ client }) => {
       name: "lámpara neón",
       price: 3000,
       stock: 12,
+      image_url: "https://picsum.photos/200/300",
     })
     .header("authorization", "Bearer " + token)
     .accept("json")
@@ -154,11 +186,28 @@ test("potential costumers request invalid date", async ({ client }) => {
     .end();
 
   // Check response status
-  response.assertStatus(500);
+  response.assertStatus(400);
   // Chek response content
   response.assertHeader("content-type", "application/json; charset=utf-8");
   // check response content
   response.assertJSON({
     message: "Invalid date",
   });
+});
+
+test("potential costumers request ok", async ({ client }) => {
+  const response = await client
+    .post("/seller/potential-customers")
+    .send({
+      initialDate: "06/05/2020",
+      finalDate: "2020/12/23",
+    })
+    .header("authorization", "Bearer " + token)
+    .accept("json")
+    .end();
+
+  // Check response status
+  response.assertStatus(200);
+  // Chek response content
+  response.assertHeader("content-type", "application/json; charset=utf-8");
 });

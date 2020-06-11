@@ -1,52 +1,22 @@
 "use strict";
 
-const User = use("App/Models/User");
-const Store = use("App/Models/Store");
-const dayjs = use("dayjs");
+const userService = use("App/Services/UserService");
 
 class UserController {
   async login({ auth, request, response }) {
-    const { email, password } = request.all();
-    return response.ok(await auth.attempt(email, password));
+    return response.ok(await userService.login(auth, request));
   }
-
   async index({ request, response }) {
-    const page = request.get().page || 1;
-    return response.ok((await User.query().paginate(page, 10)).toJSON());
+    return response.ok(await userService.index(request));
   }
-
   async createCustomer({ request, response }) {
-    const user = request.only(["username", "email", "password"]);
-    user.roles = "customer";
-    const created = await User.create(user);
-    return response.created(created.toJSON());
+    return response.created(await userService.createCustomer(request));
   }
-
   async createSeller({ request, response }) {
-    const user = request.only(["username", "email", "password"]);
-    user.roles = "seller";
-    const created = await User.create(user);
-    return response.created(created.toJSON());
+    return response.created(await userService.createSeller(request));
   }
   async potentialCustomers({ auth, request, response }) {
-    const page = request.get().page || 1;
-    let { initialDate, finalDate } = request.all();
-    const store = await Store.findBy("user_id", auth.user.id);
-    if (!initialDate || !finalDate)
-      return response.ok(
-        await store.purchases().with("user").paginate(page, 10)
-      );
-    if (!dayjs(initialDate).isValid() || !dayjs(initialDate).isValid())
-      throw { code: "INVALID_DATE" };
-    initialDate = dayjs(initialDate).format("YYYY-MM-DD");
-    finalDate = dayjs(finalDate).format("YYYY-MM-DD");
-    return response.ok(
-      await store
-        .purchases()
-        .with("user")
-        .whereBetween("transaction_date", [initialDate, finalDate])
-        .paginate(page, 10)
-    );
+    return response.ok(await userService.potentialCustomers(auth, request));
   }
 }
 

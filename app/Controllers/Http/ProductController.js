@@ -1,44 +1,43 @@
 "use strict";
 
-const Product = use("App/Models/Product");
-const Purchase = use("App/Models/Purchase");
-const User = use("App/Models/User");
+const productService = use("App/Services/ProductService");
 const Store = use("App/Models/Store");
+const Product = use("App/Models/Product");
 
 class ProductController {
   async availableProducts({ request, response }) {
-    const page = request.get().page || 1;
-    return response.ok(
-      await Product.query().where("stock", ">", 0).paginate(page, 10)
-    );
+    return response.ok(await productService.availableProducts(request));
   }
   async sellerProducts({ auth, request, response }) {
-    await this.hasPermission(auth, request);
-    const page = request.get().page || 1;
-    const user = await User.find(request.get().user_id);
-    return response.ok(await user.products().paginate(page, 10));
+    this.hasPermission(auth, request);
+    return response.ok(await productService.sellerProducts(request));
   }
 
   async registerProduct({ auth, request, response }) {
-    const product = request.only(["name", "price", "stock"]);
-    const store = await Store.findBy("user_id", auth.user.id);
-    product.store_id = store.id;
-    return response.created(await Product.create(product));
+    return response.created(
+      await productService.registerProduct(auth, request)
+    );
   }
   async salesCount({ auth, request, response }) {
     if (!request.get().product_id) {
-      const store = await Store.findBy("user_id", auth.user.id);
-      const ids = await Product.query().where("store_id", store.id).ids();
-      const total = await Purchase.query().count().whereIn("product_id", ids);
-      return response.ok({ total: total[0]["count(*)"] });
+      return response.ok(await productService.totalSalesCount(auth));
     }
-    await this.accessProductPermission(auth, request);
-    const total = await Purchase.query()
-      .count()
-      .where("product_id", request.get().product_id);
-    return response.ok({ total: total[0]["count(*)"] });
+    await this.productAccessPermission(auth, request);
+    return response.ok(await productService.productSalesCount(request));
   }
-  async accessProductPermission(auth, request) {
+  // Allow user to access only their own resources based on user_id param in url
+  // if role is admin, access is granted
+  hasPermission(auth, request) {
+    if (
+      auth.user.id != request.get().user_id &&
+      !auth.user.roles.split(",").some((x) => x === "admin")
+    )
+      throw { code: "UNAUTHORIZED" };
+  }
+  // Allow user to access only their own products based on product_id param in url
+  // if role is admin, access is granted
+  // if role is seller, access is granted for their offered products only
+  async productAccessPermission(auth, request) {
     if (!auth.user.roles.includes("admin")) {
       const store = await Store.findBy("user_id", auth.user.id);
       const ids = await Product.query().where("store_id", store.id).ids();
@@ -46,13 +45,6 @@ class ProductController {
         throw { code: "UNAUTHORIZED" };
       }
     }
-  }
-  hasPermission(auth, request) {
-    if (
-      auth.user.id != request.get().user_id &&
-      !auth.user.roles.split(",").some((x) => x === "admin")
-    )
-      throw { code: "UNAUTHORIZED" };
   }
 }
 
