@@ -10,6 +10,7 @@ class StoreSchema extends Schema {
       table.timestamps();
       table.string("name", 50).notNullable().unique();
       table.string("address", 60);
+      table.string("city", 60);
       table.integer("user_id").unsigned().references("id").inTable("users");
     });
   }

@@ -3,13 +3,19 @@
 const Purchase = use("App/Models/Purchase");
 const Product = use("App/Models/Product");
 const Store = use("App/Models/Store");
-const MongoStore = use("App/MongoShemas/StoreSchema");
+const MongoStore = use("App/MongoSchemas/StoreSchema");
 const unirest = use("unirest");
 
 class PurchaseService {
+  /**
+   * @body to create a purchase validating coordinates with store coverage
+   * product_id: number,
+   * latitude: number,
+   * longitude: number
+   * @return The created purchase data.
+   */
   async makePurchase(auth, request) {
     const { latitude, longitude, product_id } = request.all();
-    if (!latitude || !longitude || !product_id) throw { code: "MISSING_DATA" };
     const product = await Product.find(product_id);
     const store = await product.store().fetch();
     const possible = await MongoStore.findOne({
@@ -40,6 +46,10 @@ class PurchaseService {
     purchase.address = res.body.results[0].address;
     return await Purchase.create(purchase);
   }
+  /**
+   * @param purchase_id The purchase id to consult.
+   * @return The entire purchase data.
+   */
   async purchaseDetails(request) {
     return await Purchase.query()
       .with("user")
@@ -47,6 +57,11 @@ class PurchaseService {
       .where("id", request.get().purchase_id)
       .fetch();
   }
+  /**
+   * @param page The page for paginated query.
+   * @param user_id The customer user id associated to the purchases.
+   * @return The page with purchases made by the customer.
+   */
   async customerPurchases(request) {
     const page = request.get().page || 1;
     return await Purchase.query()
@@ -54,6 +69,11 @@ class PurchaseService {
       .where("user_id", request.get().user_id)
       .paginate(page, 10);
   }
+  /**
+   * @param page The page for paginated query.
+   * @param user_id The seller user id associated to the store to extract purchases.
+   * @return The page with purchases made in this store.
+   */
   async sellerSales(request) {
     const page = request.get().page || 1;
     const store = await Store.findBy("user_id", request.get().user_id);

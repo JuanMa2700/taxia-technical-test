@@ -39,13 +39,16 @@ test("create seller email alredy in use", async ({ client }) => {
       username: "Jose Zuñiga",
       email: "seller@gmail.com",
       password: "1234",
+      storeName: "Jose Store",
+      storeCity: "Manizales",
+      storeAddress: "Cra 12 # 61-23",
     })
     .header("authorization", "Bearer " + token)
     .accept("json")
     .end();
 
   // Check response status
-  response.assertStatus(500);
+  response.assertStatus(400);
   // Chek response content
   response.assertHeader("content-type", "application/json; charset=utf-8");
   // check response content
@@ -58,9 +61,12 @@ test("create seller ok", async ({ client }) => {
   const response = await client
     .post("/admin/register-seller")
     .send({
-      username: "Jose Zuñiga",
-      email: "test-seller@gmail.com",
+      username: "Jose Lopez Test User",
+      email: "joselopeztestemail@gmail.com",
       password: "1234",
+      storeName: "Jose Store",
+      storeCity: "Manizales",
+      storeAddress: "Cra 12 # 61-23",
     })
     .header("authorization", "Bearer " + token)
     .accept("json")
@@ -72,5 +78,6 @@ test("create seller ok", async ({ client }) => {
   response.assertHeader("content-type", "application/json; charset=utf-8");
 
   const user = await User.find(response.body.id);
+  await user.store().delete();
   await user.delete();
 });

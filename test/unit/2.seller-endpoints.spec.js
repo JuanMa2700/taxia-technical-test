@@ -143,12 +143,12 @@ test("register product price missing", async ({ client }) => {
     .end();
 
   // Check response status
-  response.assertStatus(500);
+  response.assertStatus(400);
   // Chek response content
   response.assertHeader("content-type", "application/json; charset=utf-8");
   // check response content
   response.assertJSON({
-    message: "Field 'price' doesn't have a default value",
+    price: "You must provide a price",
   });
 });
 
@@ -190,9 +190,7 @@ test("potential costumers request invalid date", async ({ client }) => {
   // Chek response content
   response.assertHeader("content-type", "application/json; charset=utf-8");
   // check response content
-  response.assertJSON({
-    message: "Invalid date",
-  });
+  response.assertJSON({ initialDate: "The initial date must be a valid date" });
 });
 
 test("potential costumers request ok", async ({ client }) => {

@@ -20,3 +20,5 @@ new Ignitor(require('@adonisjs/fold'))
   .appRoot(__dirname)
   .fireAce()
   .catch(console.error)
+
+

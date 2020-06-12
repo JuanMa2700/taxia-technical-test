@@ -105,7 +105,7 @@ test("make purchase product id missing", async ({ client }) => {
   response.assertHeader("content-type", "application/json; charset=utf-8");
   // check response content
   response.assertJSON({
-    message: "Missing data for transaction",
+    product_id: "You must provide a product id",
   });
 });
 

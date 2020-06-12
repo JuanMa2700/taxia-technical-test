@@ -23,9 +23,9 @@ class ExceptionHandler extends BaseExceptionHandler {
   async handle(error, { response }) {
     switch (error.code) {
       case "ER_NO_DEFAULT_FOR_FIELD":
-        return response.internalServerError({ message: error.sqlMessage });
+        return response.badRequest({ message: error.sqlMessage });
       case "ER_DUP_ENTRY":
-        return response.internalServerError({ message: error.sqlMessage });
+        return response.badRequest({ message: error.sqlMessage });
       case "E_JWT_TOKEN_EXPIRED":
         return response.unauthorized({ message: "JWT Token Expired" });
       case "E_USER_NOT_FOUND":
@@ -44,15 +44,13 @@ class ExceptionHandler extends BaseExceptionHandler {
         return response.internalServerError({ message: "Depleted stock" });
       case "E_ROUTE_NOT_FOUND":
         return response.internalServerError({ message: "Route not found" });
-      case "INVALID_DATE":
-        return response.badRequest({ message: "Invalid date" });
-      case "MISSING_DATA":
-        return response.badRequest({
-          message: "Missing data for transaction",
-        });
       case "NOT_COVERED":
         return response.serviceUnavailable({
           message: "Your location is not covered by this store",
+        });
+      case "E_VALIDATION_FAILED":
+        return response.badRequest({
+          [error.messages[0].field]: error.messages[0].message,
         });
       default:
         return response.internalServerError({

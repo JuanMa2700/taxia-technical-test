@@ -15,7 +15,7 @@ const polygonSchema = new Schema({
 
 const StoreSchema = new Schema({
   store_id: { type: Number, required: true },
-  location: polygonSchema,
+  location: { type: polygonSchema, required: true },
   created_date: { type: Date, default: Date.now },
 });
 

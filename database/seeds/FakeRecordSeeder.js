@@ -15,10 +15,11 @@ const Factory = use("Factory");
 const Purchase = use("App/Models/Purchase");
 const Product = use("App/Models/Product");
 const User = use("App/Models/User");
-const StoreMongo = use("App/MongoShemas/StoreSchema");
+const MongoStore = use("App/MongoSchemas/StoreSchema");
+const MongoCity = use("App/MongoSchemas/CitySchema");
 const mongoose = use("mongoose");
 
-const manizales = {
+const manizalesPolygon = {
   type: "Polygon",
   coordinates: [
     [
@@ -93,18 +94,53 @@ const manizales = {
   ],
 };
 
+const bogotaPolygon = {
+  type: "Polygon",
+  coordinates: [
+    [
+      [-74.03823852539062, 4.779679179562996],
+      [-74.16595458984375, 4.716724593887798],
+      [-74.18724060058594, 4.672926728547493],
+      [-74.23187255859375, 4.618175551243804],
+      [-74.18655395507812, 4.535356380895779],
+      [-74.12132263183594, 4.518243792594453],
+      [-74.07875061035156, 4.559313323087172],
+      [-74.03480529785156, 4.625704089861983],
+      [-73.99566650390625, 4.707144045990825],
+      [-74.03823852539062, 4.779679179562996],
+    ],
+  ],
+};
+
+const medellinPolygon = {
+  type: "Polygon",
+  coordinates: [
+    [
+      [-75.55469512939453, 6.347374041020438],
+      [-75.59005737304688, 6.315298538330033],
+      [-75.59726715087889, 6.2876574149193125],
+      [-75.61717987060547, 6.282197265936216],
+      [-75.64910888671875, 6.280490957629234],
+      [-75.63159942626953, 6.248752605309867],
+      [-75.57289123535156, 6.172640989828772],
+      [-75.5306625366211, 6.190048651524014],
+      [-75.53340911865234, 6.25387182486021],
+      [-75.54061889648438, 6.324853151663241],
+      [-75.55469512939453, 6.347374041020438],
+    ],
+  ],
+};
+
 class FakeRecordSeeder {
   async run() {
-    mongoose.connect("mongodb://localhost/taxia-technical", {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true,
-    });
     const db = mongoose.connection;
     try {
-      await db.dropCollection("stores");
-    } catch (error) {}
+      await MongoCity.deleteMany({});
+      await MongoStore.deleteMany({});
+    } catch (error) {
+      console.log(error);
+    }
+
     await User.create({
       id: 1,
       username: "admin",
@@ -119,9 +155,28 @@ class FakeRecordSeeder {
       password: "1234",
       roles: "seller",
     });
+    const manizales = await MongoCity.create({
+      id: 1,
+      name: "Manizales",
+      location: manizalesPolygon,
+    });
+    const medellin = await MongoCity.create({
+      id: 2,
+      name: "Medellin",
+      location: medellinPolygon,
+    });
+    const bogota = await MongoCity.create({
+      id: 3,
+      name: "Bogota",
+      location: bogotaPolygon,
+    });
     const sellerStore = await Factory.model("App/Models/Store").make();
+    sellerStore.city = "Manizales";
     await seller.store().save(sellerStore);
-    StoreMongo.create({ store_id: sellerStore.id, location: manizales });
+    await MongoStore.create({
+      store_id: sellerStore.id,
+      location: manizales.location,
+    });
     for (let j = 0; j < 10; j++) {
       const product = await Factory.model("App/Models/Product").make();
       await sellerStore.products().save(product);
@@ -133,11 +188,17 @@ class FakeRecordSeeder {
       password: "1234",
       roles: "customer",
     });
+    const cities = [manizales, medellin, bogota];
     for (let i = 0; i < 4; i++) {
       const user = await Factory.model("App/Models/User").create();
       const store = await Factory.model("App/Models/Store").make();
+      const cityIndex = Math.floor(Math.random() * (3 - 0) + 0);
+      store.city = cities[cityIndex].name;
       await user.store().save(store);
-      StoreMongo.create({ store_id: store.id, location: manizales });
+      await MongoStore.create({
+        store_id: store.id,
+        location: cities[cityIndex].location,
+      });
       const random = Math.random() * (6 - 3) + 3;
       for (let j = 0; j < random; j++) {
         const product = await Factory.model("App/Models/Product").make();
@@ -174,7 +235,33 @@ class FakeRecordSeeder {
       const user = await Factory.model("App/Models/User").make();
       user.roles = "customer";
       await user.save();
-      const random = Math.random() * (20 - 10) + 10;
+      const random = Math.random() * (15 - 10) + 10;
+      for (let j = 0; j < 5; j++) {
+        const product = await Product.find(
+          Math.floor(Math.random() * (22 - 11) + 11)
+        );
+        const day = Math.floor(Math.random() * (28 - 1) + 1);
+        const month = Math.floor(Math.random() * (12 - 1) + 1);
+        const date = "2020/" + month + "/" + day;
+        const purchase = {
+          user_id: user.id,
+          product_id: product.id,
+          transaction_date: date,
+          address:
+            "Cra. " +
+            day +
+            " # " +
+            month +
+            "-" +
+            day * 2 +
+            " , Manizales, Caldas, Colombia",
+        };
+        try {
+          await Purchase.create(purchase);
+          product.stock = product.stock + 1;
+          await product.save();
+        } catch (error) {}
+      }
       for (let j = 0; j < random; j++) {
         const product = await Product.find(
           Math.floor(Math.random() * (22 - 1) + 1)

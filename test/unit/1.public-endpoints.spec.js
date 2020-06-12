@@ -61,7 +61,7 @@ test("customer registration username alredy in use", async ({ client }) => {
     .end();
 
   // Check response status
-  response.assertStatus(500);
+  response.assertStatus(400);
   // Chek response content
   response.assertHeader("content-type", "application/json; charset=utf-8");
   // check response content
