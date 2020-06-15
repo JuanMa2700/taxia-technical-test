@@ -135,6 +135,7 @@ test("register product price missing", async ({ client }) => {
     .post("/seller/register-product")
     .send({
       name: "lámpara neón",
+      description: "tsutrfgkhlouys kytjshxjb jtdhfc",
       stock: 12,
       image_url: "https://picsum.photos/200/300",
     })
@@ -157,6 +158,7 @@ test("register product ok", async ({ client }) => {
     .post("/seller/register-product")
     .send({
       name: "lámpara neón",
+      description: "tsutrfgkhlouys kytjshxjb jtdhfc",
       price: 3000,
       stock: 12,
       image_url: "https://picsum.photos/200/300",

@@ -136,8 +136,8 @@ test("make purchase ok", async ({ client }) => {
     .post("/make-purchase")
     .send({
       product_id: 5,
-      longitude: 5.058979,
-      latitude: -75.48579,
+      longitude: 5.054883,
+      latitude: -75.501542,
     })
     .header("authorization", "Bearer " + token)
     .accept("json")

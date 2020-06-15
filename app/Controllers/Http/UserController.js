@@ -13,6 +13,12 @@ class UserController {
     return response.ok(await userService.login(auth, request));
   }
   /**
+   * @return Authenticated user information.
+   */
+  async authenticatedUserInfo({ auth, response }) {
+    return response.ok(await userService.authenticatedUserInfo(auth));
+  }
+  /**
    * @param page The page for paginated query.
    * @return The page with users registered in system.
    */

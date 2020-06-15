@@ -23,6 +23,12 @@ Route.post("/register", "UserController.createCustomer").validator(
   "CustomerCreation"
 );
 
+// -------------->> Shared authenticated routes <<---------------- //
+
+Route.group(() => {
+  Route.get("/authUser", "UserController.authenticatedUserInfo");
+}).middleware(["auth"]);
+
 // --------------------->> Admin routes <<------------------------ //
 Route.group(() => {
   Route.get("/users", "UserController.index");
@@ -52,6 +58,7 @@ Route.group(() => {
   Route.get("/product", "ProductController.productDetails");
   Route.get("/sales", "PurchaseController.sellerSales");
   Route.get("/sale", "PurchaseController.purchaseDetails");
+  Route.get("/store", "StoreController.storeDetails");
   Route.get("/sales-count", "ProductController.salesCount");
   Route.post(
     "/register-product",

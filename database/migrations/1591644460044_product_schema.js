@@ -12,9 +12,10 @@ class ProductSchema extends Schema {
       table
         .string("image_url", 100)
         .notNullable()
-        .defaultTo("https://picsum.photos/200/300");
+        .defaultTo("https://picsum.photos/200");
       table.integer("price").notNullable();
       table.integer("stock").notNullable();
+      table.string("description", 500).notNullable();
       table.integer("store_id").unsigned().references("id").inTable("stores");
       table.unique(["name", "store_id"]);
     });

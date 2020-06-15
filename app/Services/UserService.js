@@ -18,6 +18,12 @@ class UserService {
     return await auth.attempt(email, password);
   }
   /**
+   * @return Authenticated user information.
+   */
+  async authenticatedUserInfo(auth) {
+    return auth.user;
+  }
+  /**
    * @param page The page for paginated query.
    * @return The page with users registered in system.
    */
@@ -52,15 +58,17 @@ class UserService {
     const user = request.only(["username", "email", "password"]);
     user.roles = "seller";
     const { storeName, storeAddress, storeCity } = request.all();
+    const store = await Store.findBy("name", storeName);
+    if (store) await Store.create({ name: storeName });
     const newUser = await User.create(user);
-    const store = await Store.create({
+    const newStore = await Store.create({
       name: storeName,
       address: storeAddress,
       city: storeCity,
     });
-    newUser.store().save(store);
+    newUser.store().save(newStore);
     const city = await MongoCity.findOne({ name: storeCity });
-    await MongoStore.create({ store_id: store.id, location: city.location });
+    await MongoStore.create({ store_id: newStore.id, location: city.location });
     return newUser;
   }
   /**

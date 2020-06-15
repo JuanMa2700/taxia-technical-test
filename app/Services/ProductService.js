@@ -34,12 +34,19 @@ class ProductService {
   /**
    * @body to create product
    * name: string,
+   * description: string,
    * price: number,
    * stock: number
    * @return The created product data.
    */
   async registerProduct(auth, request, response) {
-    const product = request.only(["name", "price", "stock", "image_url"]);
+    const product = request.only([
+      "name",
+      "price",
+      "stock",
+      "image_url",
+      "description",
+    ]);
     const store = await Store.findBy("user_id", auth.user.id);
     product.store_id = store.id;
     return await Product.create(product);
