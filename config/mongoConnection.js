@@ -1,7 +1,10 @@
+"use strict";
+
 const mongoose = require("mongoose");
+const Env = use("Env");
 
 mongoose
-  .connect("mongodb://localhost/taxia-technical", {
+  .connect(Env.get("MONGO_HOST"), {
     useCreateIndex: true,
     useNewUrlParser: true,
     useFindAndModify: false,

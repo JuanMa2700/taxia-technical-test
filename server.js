@@ -18,9 +18,10 @@
 */
 
 const { Ignitor } = require("@adonisjs/ignitor");
-require("./mongo-connection");
 
 new Ignitor(require("@adonisjs/fold"))
   .appRoot(__dirname)
   .fireHttpServer()
   .catch(console.error);
+
+require("./config/mongoConnection");

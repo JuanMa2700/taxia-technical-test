@@ -30,6 +30,7 @@
     "@adonisjs/validator": "^5.0.6",
     "@adonisjs/vow": "^1.0.17",
     "dayjs": "^1.8.28",
+    "dotenv": "^8.2.0",
     "mongoose": "^5.9.18",
     "mysql": "^2.18.1",
     "unirest": "^0.6.0"
